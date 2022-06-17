@@ -86,7 +86,8 @@ class messageTree:
         if (len(fileList) == 0):
             return
         for fileName in fileList:
-            with open(fileName, 'r') as f:
+            print(fileName)
+            with open("messages/"+fileName, 'r') as f:
                 data = json.load(f)
             self.nodeList.append(Node(data['body']))
 
@@ -139,8 +140,9 @@ class messageTree:
                     'content': n.content,
                     'time': n.time,
                     'signature': n.signature,
-                    'children': self.getSubtree()
+                    'children': self._getChildren(n)
                 }
+        return subtree
 
     def _getChildren(self, n: Node) -> dict:
         children = []
