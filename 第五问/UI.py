@@ -19,6 +19,7 @@ mt=messageTree()
 mt.constructTree()
 this_peer=PeerHandler(name,this_ip,this_port,on_receive_message=mt.insert)
 this_peer.login((tracker_ip,tracker_port))
+this_peer.request_all()
 
 def 发帖():
     title=e1.get()
