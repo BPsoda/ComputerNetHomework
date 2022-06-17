@@ -144,6 +144,7 @@ class PeerHandler:
             with open("messages/{}.json","w") as f:
                 json.dump(data,f)
             """同时插入到内存里：还没写"""
+            
         elif data["type"]=="quit":# 邻居退出
             for port in data["ports"]:
                 if (_:=(data["ip"],port)) in self.peers:#########################在quit包中加入自己的ip和ports##########################

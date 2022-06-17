@@ -14,7 +14,9 @@ if not os.path.exists("rsa_private_key.pem") or not os.path.exists("rsa_public_k
 with open("rsa_public_key.pem","r") as f:
     name=f.read().split("\n")[1][:8]
 
-this_peer=PeerHandler(name,this_ip,this_port)
+mt=messageTree()
+mt.constructTree()
+this_peer=PeerHandler(name,this_ip,this_port,on_receive)
 this_peer.login((tracker_ip,tracker_port))
 
 def 发帖():
@@ -23,7 +25,7 @@ def 发帖():
     ################################
     ret=Node({
         "level":1,
-        "parent":0,
+        "parent":0,################################################################### parentId 
         "content":title+"\n\n"+description,
         "source":name,
         "destination":None
@@ -55,8 +57,6 @@ def 回帖(*args):
     this_peer.send(_,None)
     ###############################
     text_input.delete(0.0,tk.END)
-mt=messageTree()
-mt.constructTree()
 
 root =tk.Tk()
 root.title(string = "title") 
