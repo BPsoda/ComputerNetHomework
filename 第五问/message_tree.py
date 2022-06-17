@@ -96,7 +96,8 @@ class messageTree:
                 data = json.load(f)
             self.nodeList.append(Node(data['body']))
 
-        self.nodeList.sort(key=lambda x: x.time)    # 按时间排序
+        self.nodeList.sort(key=lambda x: x.time)
+        print(self.nodeList)    # 按时间排序
         self.root = self.nodeList[0]
         for i in range(1, len(self.nodeList)):
             # 检查真伪
@@ -183,4 +184,12 @@ class messageTree:
         return p.id
 
     def getTailChildId(self, rootId):
-        return self.getTailSiblingId(self.getNode(rootId).firstSon)
+        child = self.getNode(rootId).firstSon
+        if child is None:
+            return rootId
+        return self.getTailSiblingId(self.getNode(rootId).firstSon.id)
+
+if __name__=="__main__":
+    a=messageTree()
+    a.constructTree()
+    print(str(a.getWholeTree()))

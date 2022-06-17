@@ -49,7 +49,7 @@ def 回帖(*args):
     # print(content)
     ret=mt.insert({
         "level":node.level+1,
-        "parent":node.id,
+        "parent":mt.getTailChildId(node.id) if mt.root!=None else "0",
         "content":content,
         "source":name,
         "destination":None
@@ -60,17 +60,17 @@ def 回帖(*args):
     ###############################
     msgbox.showinfo('信息', '发帖成功')
     text_input.delete(0.0,tk.END)
-    tabControl.select(tab1)
-    tabControl.select(tab2)
     treeview_update()
-def addnode(x:list,exists:set,f=""):
+def addnode(x:list,f=""):
+    global tree_set
     for i in x:
-        if i["id"] in exists:continue
-        print(f," --> ",i["id"])
-        tree.insert(f,tk.END,text=i["content"].replace("\n"," "),iid=i["id"],values=i["id"],open=False)
-        addnode(i["children"],exists,i["id"])
+        if not i["id"] in tree_set:
+            tree_set.add(i["id"])
+            print(f," --> ",i["id"])
+            tree.insert(f,tk.END,text=i["content"].replace("\n"," "),iid=i["id"],values=i["id"],open=False)
+        addnode(i["children"],i["id"])
 def treeview_update():
-    addnode(mt.getWholeTree(),set(tree.get_children()))
+    addnode(mt.getWholeTree())
     tree.update()
 root =tk.Tk()
 root.title(string = "title") 
@@ -89,7 +89,8 @@ publish.grid(row=1, column=2)
 tab2 = tk.Frame(tabControl)
 tabControl.add(tab2, text='看帖')
 tree = ttk.Treeview(tab2)
-addnode(mt.getWholeTree(),set())
+tree_set=set()
+treeview_update()
 
 tree.grid(row=0, column=0,ipady=80,rowspan=2)
 def select_tree():
@@ -102,7 +103,6 @@ def select_tree():
         view.delete(0.0,tk.END)
         view.insert(tk.END,node.content)
         view.config(state='disabled')
-        break
 
 
 tree.bind("<<TreeviewSelect>>", lambda event: select_tree())
