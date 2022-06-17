@@ -9,6 +9,8 @@ class Node:
         self.level = pkt['level']
         self.parentId = pkt['parent']
         self.content = pkt['content']
+        self.source=pkt["source"]
+        self.destination=pkt["destination"]
         if 'time' in pkt.keys():
             self.time = pkt['time']
         else:
@@ -43,6 +45,8 @@ class Node:
         }'''
         pkt = {
             'type': 'message',
+            "source": self.source,
+            "destination":  self.destination,
             'time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
             'body': {'id':self.id,
                 'level': self.level,

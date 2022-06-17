@@ -1,28 +1,62 @@
+from ast import arg
 import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox as msgbox
 from tkinter import scrolledtext  
 from message_tree import *
+from peerhandler import PeerHandler
+
+this_ip,this_port=None
+tracker_ip,tracker_port="10.162.8.133",5000
+
+if not os.path.exists("rsa_private_key.pem") or not os.path.exists("rsa_public_key.pem"):
+    generate_keypair()
+with open("rsa_public_key.pem","r") as f:
+    name=f.read().split("\n")[1][:8]
+
+this_peer=PeerHandler(name,this_ip,this_port)
+this_peer.login((tracker_ip,tracker_port))
+
 def 发帖():
     title=e1.get()
     description=e2.get(0.0,tk.END)
     ################################
-    print([title,description])
+    ret=Node({
+        "level":1,
+        "parent":0,
+        "content":title+"\n\n"+description,
+        "source":name,
+        "destination":None
+    })
+    with open("messages/{}.json".format(ret.id),"w") as f:
+        f.write(_:=ret.makepkt())
+    this_peer.send(_,None)
+    # level 1
     ################################
     msgbox.showinfo('信息', '发帖成功')
     e1.delete(0,tk.END)
     e2.delete(0.0,tk.END)
     tabControl.select(tab2)
-viewing=None
-def 回帖():
+viewing_id=None
+def 回帖(*args):
     content=text_input.get(0.0,tk.END)
+    node=mt.getNode(viewing_id)
+    ###############################
+    # print(content)
+    ret=Node({
+        "level":node.level+1,
+        "parent":node.parentId,
+        "content":content,
+        "source":name,
+        "destination":None
+    })
+    with open("messages/{}.json".format(ret.id),"w") as f:
+        f.write(_:=ret.makepkt())
+    this_peer.send(_,None)
+    ###############################
     text_input.delete(0.0,tk.END)
-    ###############################
-    
-    ###############################
 mt=messageTree()
 mt.constructTree()
-
 
 root =tk.Tk()
 root.title(string = "title") 
@@ -42,13 +76,18 @@ tab2 = tk.Frame(tabControl)
 tabControl.add(tab2, text='看帖')
 tree = ttk.Treeview(tab2)
 
-for node in mt.nodeList:
-    tree.insert(node.parentId if node.parent!=None else '',tk.END,text="Node",iid=node.id,values=node.id,open=False)
+def addnode(x:list,f=1):
+    for i in x:
+        tree.insert(i["parent"] if f==0 else '',tk.END,text=i["content"],iid=i["id"],values=i["id"],open=False)
+        addnode(i["children"],0)
+addnode(mt.getWholeTree())
+
 tree.grid(row=0, column=0,ipady=80,rowspan=2)
 def select_tree():
+    global viewing_id
     for item in tree.selection():
         id=tree.item(item, "values")[0]
-        viewing=id
+        viewing_id=id
         node=mt.getNode(id)
         view.config(state='normal')
         view.delete(0.0,tk.END)
