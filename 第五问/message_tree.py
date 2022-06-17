@@ -157,3 +157,11 @@ class messageTree:
             'signature': n.signature,
             'children': list(self._getChildren(x) for x in children)
         }
+
+    def getWholeTree(self):
+        p = self.root
+        wholeTree = []
+        while not p is None:
+            wholeTree.append(self._getChildren(p))
+            p = p.sibling
+        return wholeTree
