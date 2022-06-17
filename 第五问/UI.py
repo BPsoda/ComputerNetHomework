@@ -13,7 +13,7 @@ tracker_ip,tracker_port="10.162.8.133",5000
 if not os.path.exists("rsa_private_key.pem") or not os.path.exists("rsa_public_key.pem"):
     generate_keypair()
 with open("rsa_public_key.pem","r") as f:
-    name=hex(hash(f.read().split("\n")))
+    name=hex(hash(f.read()))
 
 mt=messageTree()
 mt.constructTree()
