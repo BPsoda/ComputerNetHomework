@@ -13,8 +13,13 @@ def 发帖():
     e1.delete(0,tk.END)
     e2.delete(0.0,tk.END)
     tabControl.select(tab2)
+viewing=None
 def 回帖():
-    content=
+    content=text_input.get(0.0,tk.END)
+    text_input.delete(0.0,tk.END)
+    ###############################
+    
+    ###############################
 mt=messageTree()
 mt.constructTree()
 
@@ -36,12 +41,14 @@ publish.grid(row=1, column=2)
 tab2 = tk.Frame(tabControl)
 tabControl.add(tab2, text='看帖')
 tree = ttk.Treeview(tab2)
+
 for node in mt.nodeList:
     tree.insert(node.parentId if node.parent!=None else '',tk.END,text="Node",iid=node.id,values=node.id,open=False)
 tree.grid(row=0, column=0,ipady=80,rowspan=2)
 def select_tree():
     for item in tree.selection():
         id=tree.item(item, "values")[0]
+        viewing=id
         node=mt.getNode(id)
         view.config(state='normal')
         view.delete(0.0,tk.END)
