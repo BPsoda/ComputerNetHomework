@@ -112,7 +112,7 @@ class messageTree:
 
     def insert(self, n: dict) -> None:
         '''插入一个新节点'''
-        self.nodeList.append(Node(dict))
+        self.nodeList.append(Node(n))
         # 插入树中
         for i in range(-1, -len(self.nodeList), -1):
             if self.nodeList[i].id == self.nodeList[-1].parentId:
