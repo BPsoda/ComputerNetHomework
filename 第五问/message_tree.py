@@ -86,7 +86,8 @@ class messageTree:
         if (len(fileList) == 0):
             return
         for fileName in fileList:
-            with open(fileName, 'r') as f:
+            print(fileName)
+            with open("messages/"+fileName, 'r') as f:
                 data = json.load(f)
             self.nodeList.append(Node(data['body']))
 

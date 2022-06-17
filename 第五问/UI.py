@@ -35,14 +35,15 @@ publish.grid(row=1, column=2)
 tab2 = tk.Frame(tabControl)
 tabControl.add(tab2, text='看帖')
 tree = ttk.Treeview(tab2)
+print(mt.nodeList)
 for node in mt.nodeList:
     tree.insert(node.parentId if node.parent!=None else '',tk.END,text="Node",iid=node.id,values=node.id,open=False)
 tree.grid(row=0, column=0,ipady=80,rowspan=2)
 def select_tree():
     for item in tree.selection():
-        id=tree.item(item, "values")
+        id=tree.item(item, "values")[0]
         node=mt.getNode(id)
-        view.config(state='abled')
+        view.config(state='normal')
         view.delete(0.0,tk.END)
         view.insert(tk.END,node.content)
         view.config(state='disabled')
