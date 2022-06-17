@@ -64,7 +64,7 @@ class Node:
         with open('rsa_public_key.pem', 'rb')as f:
             public_key = f.read()
         data = json.dumps({'id': self.id, 'level': self.level, 'parent': self.parentId, 'content': self.content, 'time': self.time})
-        return {'sign': sign(private_key, data), 'pub': public_key}
+        return {'sign': sign(private_key, data), 'pub': public_key.decode('utf-8')}
 
     def verification(self) -> bool:
         # check id
