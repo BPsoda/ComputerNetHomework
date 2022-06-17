@@ -76,6 +76,7 @@ class PeerHandler:
     def __init__(self,name:str,self_ip:str,connection_port:int,on_receive_message):
         if not os.path.exists("messages"):
             os.makedirs("messages")
+        self.on_receive_message=on_receive_message
         self.name=name
         self.listening_ports=set()
         """主机标识"""
@@ -136,14 +137,15 @@ class PeerHandler:
             for i in data:
                 with open("messages/{}.json".format(i["body"]["id"]),"w") as f:
                     json.dump(i,f)
+                self.on_receive_message(i["body"])
         elif data["type"]=="request":# 发送所有数据包
             for i in os.listdir("messages"):
                 self.send(json.dumps([json_load(i)]),data["source"])############所有包中加入source##############
         elif data["type"]=="message":# 接收正常的消息包
-            with open("messages/{}.json","w") as f:
+            with open("messages/{}.json".format(data["body"]["id"]),"w") as f:
                 json.dump(data,f)
             """同时插入到内存里："""
-            self.on_receive_message(data)
+            self.on_receive_message(data["body"])
         elif data["type"]=="quit":# 邻居退出
             for port in data["ports"]:
                 if (_:=(data["ip"],port)) in self.peers:#########################在quit包中加入自己的ip和ports##########################

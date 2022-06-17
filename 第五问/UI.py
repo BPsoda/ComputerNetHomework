@@ -4,7 +4,6 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox as msgbox
 from tkinter import scrolledtext
-from turtle import update  
 from message_tree import *
 from peerhandler import PeerHandler
 def md5(x:str):
@@ -63,6 +62,7 @@ def 回帖(*args):
     msgbox.showinfo('信息', '发帖成功')
     text_input.delete(0.0,tk.END)
     treeview_update()
+
 def addnode(x:list,f=""):
     global tree_set
     for i in x:
@@ -103,7 +103,7 @@ def select_tree():
         node=mt.getNode(id)
         view.config(state='normal')
         view.delete(0.0,tk.END)
-        view.insert(tk.END,node.content)
+        view.insert(tk.END,node.content+"\n"+"-"*20+"\n"+" "*10+"User: "+node.source)
         view.config(state='disabled')
 
 
@@ -117,4 +117,6 @@ text_input.grid(row=1,column=1,padx=10)
 text_input.bind("<Control-Return>",回帖)
 tabControl.pack(expand=1, fill="both")
 tabControl.select(tab1) 
-root.mainloop()
+# root.mainloop()
+while True:
+    treeview_update()
