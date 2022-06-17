@@ -1,6 +1,7 @@
 import json
 import time
 from anti_fraud import *
+import os
 
 class Node:
     def __init__(self, pkt:dict) -> None:
@@ -67,7 +68,11 @@ class messageTree:
 
     def constructTree(self):
         '''从本地保存的文件中读取节点并组成一棵树'''
-        pass
+        fileList = os.listdir('messages/')
+        for fileName in fileList:
+            with open(fileName, 'r') as f:
+                data = json.load(f)
+            
 
     def insert(self, n: Node) -> None:
         '''插入一个新节点'''
