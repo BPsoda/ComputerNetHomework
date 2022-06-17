@@ -8,9 +8,10 @@ from message_tree import *
 from peerhandler import PeerHandler
 def md5(x:str):
     return hashlib.md5(x.encode("utf-8")).hexdigest()
+#####################################################
 this_ip,this_port="10.162.8.133",5001
 tracker_ip,tracker_port="10.162.8.133",5000
-
+#####################################################
 if not os.path.exists("rsa_private_key.pem") or not os.path.exists("rsa_public_key.pem"):
     generate_keypair()
 with open("rsa_public_key.pem","r") as f:

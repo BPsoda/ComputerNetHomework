@@ -2,7 +2,9 @@ import socket,threading,time,queue,json,os,sys,random
 ##################################################################
 def json_load(fname:str):
     with open("messages/"+fname,"r") as f:
-        return json.load(f)
+        ret= json.load(f)
+    ret["time"]=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    return ret
 ##################################################################
 def make_message(source_name:str,destination_name:str,_id:str,level:int,parent:str,content:str,signature:str):
     return json.dumps({
