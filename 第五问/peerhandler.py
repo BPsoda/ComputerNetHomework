@@ -73,7 +73,7 @@ def send(peer:tuple,sender_buffer:queue.Queue):
     client.close()
 ###################################################################
 class PeerHandler:
-    def __init__(self,name:str,self_ip:str,connection_port:int=5000):
+    def __init__(self,name:str,self_ip:str,connection_port:int,on_receive_message):
         if not os.path.exists("messages"):
             os.makedirs("messages")
         self.name=name
@@ -143,8 +143,8 @@ class PeerHandler:
         elif data["type"]=="message":# 接收正常的消息包
             with open("messages/{}.json","w") as f:
                 json.dump(data,f)
-            """同时插入到内存里：还没写"""
-            
+            """同时插入到内存里："""
+            self.on_receive_message(data)
         elif data["type"]=="quit":# 邻居退出
             for port in data["ports"]:
                 if (_:=(data["ip"],port)) in self.peers:#########################在quit包中加入自己的ip和ports##########################

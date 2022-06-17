@@ -6,7 +6,7 @@ from tkinter import scrolledtext
 from message_tree import *
 from peerhandler import PeerHandler
 
-this_ip,this_port=None
+this_ip,this_port="10.162.8.133",5001
 tracker_ip,tracker_port="10.162.8.133",5000
 
 if not os.path.exists("rsa_private_key.pem") or not os.path.exists("rsa_public_key.pem"):
@@ -16,20 +16,21 @@ with open("rsa_public_key.pem","r") as f:
 
 mt=messageTree()
 mt.constructTree()
-this_peer=PeerHandler(name,this_ip,this_port,on_receive)
+this_peer=PeerHandler(name,this_ip,this_port,on_receive_message=mt.insert)
 this_peer.login((tracker_ip,tracker_port))
 
 def 发帖():
     title=e1.get()
     description=e2.get(0.0,tk.END)
     ################################
-    ret=Node({
+    ret=Node(_:={
         "level":1,
-        "parent":0,################################################################### parentId 
+        "parent":mt.getTailSiblingId(mt.root),
         "content":title+"\n\n"+description,
         "source":name,
         "destination":None
     })
+    mt.insert(_)
     with open("messages/{}.json".format(ret.id),"w") as f:
         f.write(_:=ret.makepkt())
     this_peer.send(_,None)
@@ -39,6 +40,7 @@ def 发帖():
     e1.delete(0,tk.END)
     e2.delete(0.0,tk.END)
     tabControl.select(tab2)
+    treeview_update()
 viewing_id=None
 def 回帖(*args):
     content=text_input.get(0.0,tk.END)
@@ -57,7 +59,14 @@ def 回帖(*args):
     this_peer.send(_,None)
     ###############################
     text_input.delete(0.0,tk.END)
-
+    treeview_update()
+def addnode(x:list,f=1):
+    for i in x:
+        tree.insert(i["parent"] if f==0 else '',tk.END,text=i["content"],iid=i["id"],values=i["id"],open=False)
+        addnode(i["children"],0)
+def treeview_update():
+    print(mt.getWholeTree())
+    addnode(mt.getWholeTree())
 root =tk.Tk()
 root.title(string = "title") 
 tabControl = ttk.Notebook(root)  
@@ -75,11 +84,6 @@ publish.grid(row=1, column=2)
 tab2 = tk.Frame(tabControl)
 tabControl.add(tab2, text='看帖')
 tree = ttk.Treeview(tab2)
-
-def addnode(x:list,f=1):
-    for i in x:
-        tree.insert(i["parent"] if f==0 else '',tk.END,text=i["content"],iid=i["id"],values=i["id"],open=False)
-        addnode(i["children"],0)
 addnode(mt.getWholeTree())
 
 tree.grid(row=0, column=0,ipady=80,rowspan=2)

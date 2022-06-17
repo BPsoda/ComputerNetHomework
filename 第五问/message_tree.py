@@ -45,10 +45,11 @@ class Node:
         }'''
         pkt = {
             'type': 'message',
-            "source": self.source,
-            "destination":  self.destination,
             'time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
-            'body': {'id':self.id,
+            'body': {
+                "source": self.source,
+                "destination":  self.destination,
+                'id':self.id,
                 'level': self.level,
                 'parent': self.parentId,
                 'content': self.content,
@@ -172,11 +173,12 @@ class messageTree:
             p = p.sibling
         return wholeTree
 
-    def getTailSiblingId(self, root):
-        p = root
+    def getTailSiblingId(self, rootId):
+        p = self.getNode(rootId)
+        if p==None:return "0"
         while not p.sibling is None:
             p = p.sibling
         return p.id
 
-    def getTailChildId(self, root):
-        return self.getTailSiblingId(root.firstSon)
+    def getTailChildId(self, rootId):
+        return self.getTailSiblingId(self.getNode(rootId).firstSon)

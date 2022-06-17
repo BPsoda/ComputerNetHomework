@@ -1,4 +1,4 @@
-import socket,threading,time,queue,json,os,sys,random
+import socket,threading,time,queue,json,os,sys
 ##################################################################
 def port_avaliable(port:int):
     """判断端口是否可用"""
@@ -9,14 +9,6 @@ def port_avaliable(port:int):
     with os.popen(cmd, 'r') as f:
         if ''!=f.read():return False
         else:return True
-##################################################################
-def get_avaliable_ports(n:int=1):
-    """返回 n 个可用端口"""
-    ret=[]
-    for port in range(random.randint(5000,8000),65536):
-        if len(ret)>=n:break
-        if port_avaliable(port):ret.append(port)
-    return ret[:n]
 ##################################################################
 def makepkt(msg:str,s_name:str,t_name:str):
     return json.dumps({
@@ -53,7 +45,7 @@ def send(peer:tuple,sender_buffer:queue.Queue):
     client.close()
 ###################################################################
 class PeerHandler:
-    def __init__(self,name:str,connection_port:int=5000):
+    def __init__(self,name:str):
         self.name=name
         """主机标识"""
         self.peers={}
@@ -62,23 +54,12 @@ class PeerHandler:
         """见过的消息的hash值"""
         self.msg=queue.Queue()
         """待发送信息"""
-        self.living=True
-        self.connection_port=connection_port
-
-        self.t=threading.Thread(target=self.connection_module,args=(connection_port,))
-        self.t.setDaemon(True)
-        self.t.start()
-
-        self.t=threading.Thread(target=self.run)
-        self.t.setDaemon(True)
-        self.t.start()
 
     def ip(self):
         """返回自身ip字符串"""
         return socket.gethostbyname(socket.gethostname())
 
     def addpeer(self,port:int,peer:list):
-        print(self.name,"addpeer",port,peer)
         """添加 peer 
         参数 peer 的格式：[ip,port]
         """
@@ -121,40 +102,3 @@ class PeerHandler:
                 tmp=self.msg.get()
                 for p in self.peers:
                     self.peers[p][1].put(tmp)
-
-    def __del__(self):
-        self.living=False
-
-    def connection_module(self,port:int):
-        server = socket.socket()
-        server.bind((socket.gethostbyname(socket.gethostname()),port))
-        server.listen(4)
-        while self.living:
-            serObj,address=server.accept()
-            re_data = json.loads(serObj.recv(1024).decode('utf-8'))
-
-            if re_data["type"]=="PORTS":
-                send_data=get_avaliable_ports(re_data["value"])
-            elif re_data["type"]=="ADD":
-                self.addpeer(re_data["value"]["port"],tuple(re_data["value"]["peer"]))
-                send_data=None
-
-            serObj.send(json.dumps(send_data).encode('utf-8'))
-
-            serObj.close()
-        server.close()
-    
-    def login(self,tracker:tuple):
-        client = socket.socket()
-        client.connect(tracker)
-
-        send_data=json.dumps([
-            self.name,
-            self.ip(),
-            self.connection_port,
-            get_avaliable_ports(10)
-        ])
-        client.send(send_data.encode('utf-8'))
-        recv_data=client.recv(1024).decode('utf-8')
-        client.close()
-        return self
