@@ -171,3 +171,12 @@ class messageTree:
             wholeTree.append(self._getChildren(p))
             p = p.sibling
         return wholeTree
+
+    def getTailSiblingId(self, root):
+        p = root
+        while not p.sibling is None:
+            p = p.sibling
+        return p.id
+
+    def getTailChildId(self, root):
+        return self.getTailSiblingId(root.firstSon)
