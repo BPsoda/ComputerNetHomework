@@ -116,17 +116,20 @@ class messageTree:
                     break
 
 
-    def insert(self, n: dict) -> None:
+    def insert(self, n: dict) -> Node:
         '''插入一个新节点'''
         self.nodeList.append(Node(n))
         # 插入树中
-        for i in range(-1, -len(self.nodeList), -1):
+        if self.root == None:
+            self.root = self.nodeList[-1]
+        for i in range(-1, -len(self.nodeList)-1, -1):
             if self.nodeList[i].id == self.nodeList[-1].parentId:
                 self.nodeList[-1].parent = self.nodeList[i]
                 if self.nodeList[i].level == self.nodeList[-1].level:
                     self.nodeList[i].sibling = self.nodeList[-1]
                 else:
                     self.nodeList[i].firstSon = self.nodeList[-1]
+        return self.nodeList[-1]
 
     def getNode(self, id) -> Node:
         for n in self.nodeList:
@@ -175,7 +178,6 @@ class messageTree:
 
     def getTailSiblingId(self, rootId):
         p = self.getNode(rootId)
-        if p==None:return "0"
         while not p.sibling is None:
             p = p.sibling
         return p.id

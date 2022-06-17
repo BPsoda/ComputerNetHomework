@@ -2,7 +2,8 @@ from ast import arg
 import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox as msgbox
-from tkinter import scrolledtext  
+from tkinter import scrolledtext
+from turtle import update  
 from message_tree import *
 from peerhandler import PeerHandler
 
@@ -23,14 +24,13 @@ def 发帖():
     title=e1.get()
     description=e2.get(0.0,tk.END)
     ################################
-    ret=Node(_:={
+    ret=mt.insert({
         "level":1,
-        "parent":mt.getTailSiblingId(mt.root),
+        "parent":mt.getTailSiblingId(mt.root.id) if mt.root!=None else "0",
         "content":title+"\n\n"+description,
         "source":name,
         "destination":None
     })
-    mt.insert(_)
     with open("messages/{}.json".format(ret.id),"w") as f:
         f.write(_:=ret.makepkt())
     this_peer.send(_,None)
@@ -47,9 +47,9 @@ def 回帖(*args):
     node=mt.getNode(viewing_id)
     ###############################
     # print(content)
-    ret=Node({
+    ret=mt.insert({
         "level":node.level+1,
-        "parent":node.parentId,
+        "parent":node.id,
         "content":content,
         "source":name,
         "destination":None
@@ -58,15 +58,20 @@ def 回帖(*args):
         f.write(_:=ret.makepkt())
     this_peer.send(_,None)
     ###############################
+    msgbox.showinfo('信息', '发帖成功')
     text_input.delete(0.0,tk.END)
+    tabControl.select(tab1)
+    tabControl.select(tab2)
     treeview_update()
-def addnode(x:list,f=1):
+def addnode(x:list,exists:set,f=""):
     for i in x:
-        tree.insert(i["parent"] if f==0 else '',tk.END,text=i["content"],iid=i["id"],values=i["id"],open=False)
-        addnode(i["children"],0)
+        if i["id"] in exists:continue
+        print(f," --> ",i["id"])
+        tree.insert(f,tk.END,text=i["content"].replace("\n"," "),iid=i["id"],values=i["id"],open=False)
+        addnode(i["children"],exists,i["id"])
 def treeview_update():
-    print(mt.getWholeTree())
-    addnode(mt.getWholeTree())
+    addnode(mt.getWholeTree(),set(tree.get_children()))
+    tree.update()
 root =tk.Tk()
 root.title(string = "title") 
 tabControl = ttk.Notebook(root)  
@@ -84,7 +89,7 @@ publish.grid(row=1, column=2)
 tab2 = tk.Frame(tabControl)
 tabControl.add(tab2, text='看帖')
 tree = ttk.Treeview(tab2)
-addnode(mt.getWholeTree())
+addnode(mt.getWholeTree(),set())
 
 tree.grid(row=0, column=0,ipady=80,rowspan=2)
 def select_tree():
