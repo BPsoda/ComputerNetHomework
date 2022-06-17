@@ -13,7 +13,8 @@ def 发帖():
     e1.delete(0,tk.END)
     e2.delete(0.0,tk.END)
     tabControl.select(tab2)
-
+def 回帖():
+    content=
 mt=messageTree()
 mt.constructTree()
 
@@ -35,7 +36,6 @@ publish.grid(row=1, column=2)
 tab2 = tk.Frame(tabControl)
 tabControl.add(tab2, text='看帖')
 tree = ttk.Treeview(tab2)
-print(mt.nodeList)
 for node in mt.nodeList:
     tree.insert(node.parentId if node.parent!=None else '',tk.END,text="Node",iid=node.id,values=node.id,open=False)
 tree.grid(row=0, column=0,ipady=80,rowspan=2)
@@ -57,7 +57,7 @@ view.grid(row=0,column=1,padx=10)
 
 text_input=scrolledtext.ScrolledText(tab2,height=5)
 text_input.grid(row=1,column=1,padx=10)
-
+text_input.bind("<Control-Return>",回帖)
 tabControl.pack(expand=1, fill="both")
 tabControl.select(tab1) 
 root.mainloop()
