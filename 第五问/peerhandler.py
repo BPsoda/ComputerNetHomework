@@ -97,7 +97,6 @@ class PeerHandler:
         self.t.setDaemon(True)
         self.t.start()
 
-        self.request_done=False
         self.request_all()
 
         self.dead_peers=queue.Queue()
@@ -133,13 +132,13 @@ class PeerHandler:
         print(self.name+" received:"+pkt+"\n\n",end='')
         data=json.loads(json.loads(pkt)["content"])
         print(data)
-        if not self.request_done and type(data)==list:# 接收返回的所有数据包
+        if type(data)==list:# 接收返回的所有数据包
             for i in data:
                 with open("messages/{}.json".format(i["body"]["id"]),"w") as f:
                     json.dump(i,f)
-            self.request_done=True
         elif data["type"]=="request":# 发送所有数据包
-            self.send(json.dumps([json_load(i) for i in os.listdir("messages")]),data["source"])############所有包中加入source##############
+            for i in os.listdir("messages"):
+                self.send(json.dumps([json_load(i)]),data["source"])############所有包中加入source##############
         elif data["type"]=="message":# 接收正常的消息包
             with open("messages/{}.json","w") as f:
                 json.dump(data,f)
