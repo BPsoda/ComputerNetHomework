@@ -139,8 +139,9 @@ class messageTree:
                     'content': n.content,
                     'time': n.time,
                     'signature': n.signature,
-                    'children': self.getSubtree()
+                    'children': self._getChildren(n)
                 }
+        return subtree
 
     def _getChildren(self, n: Node) -> dict:
         children = []
