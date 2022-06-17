@@ -22,7 +22,7 @@ def make_message(source_name:str,destination_name:str,_id:str,level:int,parent:s
 ##################################################################
 def port_avaliable(port:int):
     """判断端口是否可用"""
-    if port<32768 or 65535<port:return False
+    if port<4096 or 65535<port:return False
     if 'win32'==sys.platform: cmd='netstat -aon|findstr ":%s "'%port
     elif 'linux'==sys.platform: cmd='netstat -aon|grep ":%s "'%port
     else: raise NotImplementedError('Unsupported system type %s'%sys.platform)
@@ -52,7 +52,7 @@ def listen(port:int,ip:str,recv_buffer:queue.Queue):
     server.listen(4)
     serObj,address=server.accept()
     while True:
-        re_data = serObj.recv(32768).decode('utf-8')
+        re_data = serObj.recv(4096).decode('utf-8')
         if re_data=="QUIT":break
         recv_buffer.put(re_data)
         serObj.send("ok".encode('utf-8'))
@@ -69,7 +69,7 @@ def send(peer:tuple,sender_buffer:queue.Queue):
         send_data=sender_buffer.get()
         client.send(send_data.encode('utf-8'))
         if send_data == 'QUIT':break
-        print,("reply: ",client.recv(32768).decode('utf-8'))
+        print,("reply: ",client.recv(4096).decode('utf-8'))
     client.close()
 ###################################################################
 class PeerHandler:
@@ -163,7 +163,7 @@ class PeerHandler:
             self.name,
         ])
         client.send(send_data.encode('utf-8'))
-        recv_data=client.recv(32768).decode('utf-8')
+        recv_data=client.recv(4096).decode('utf-8')
         client.close()
 
     def run(self):
@@ -197,7 +197,7 @@ class PeerHandler:
         server.listen(4)
         while self.living:
             serObj,address=server.accept()
-            re_data = json.loads(serObj.recv(32768).decode('utf-8'))
+            re_data = json.loads(serObj.recv(4096).decode('utf-8'))
 
             if re_data["type"]=="PORTS":
                 send_data=get_avaliable_ports(re_data["value"])
@@ -222,6 +222,6 @@ class PeerHandler:
             get_avaliable_ports(10)
         ])
         client.send(send_data.encode('utf-8'))
-        recv_data=client.recv(32768).decode('utf-8')
+        recv_data=client.recv(4096).decode('utf-8')
         client.close()
         return self
